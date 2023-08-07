@@ -56,6 +56,8 @@
         type = "app";
         program = "${self.defaultPackage."${sys}"}/bin/nvim";
       });
+
+      overlay = final: prev: { adam-neovim = prev.pkgs.callPackage ./. { }; };
     };
 
 }
