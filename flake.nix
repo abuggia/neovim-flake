@@ -44,6 +44,8 @@
                   telescope-frecency-nvim
                   markdown-preview-nvim
                   catppuccin-nvim
+                  nvim-web-devicons
+                  bufferline-nvim
                 ];
               };
 	          };
