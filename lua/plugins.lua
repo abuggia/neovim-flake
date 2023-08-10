@@ -21,6 +21,7 @@ vim.keymap.set('n', '<leader>g', require('telescope.builtin').live_grep, { desc 
 local bufferline = require('bufferline')
 bufferline.setup {
   options = {
+    always_show_bufferline = false,
     buffer_close_icon = "x",
     diagnostics = false,
     diagnostics_update_in_insert = false,
