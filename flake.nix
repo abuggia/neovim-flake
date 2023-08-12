@@ -21,11 +21,7 @@
               pkgs.rustup
           ];
           vimrc = ''
-            lua << EOF
-              package.path = "${self}/lua/?.lua;" .. package.path
-              rustsrc_path = "${pkgs.rustPlatform.rustLibSrc}/core/Cargo.toml"
-              vim.env.RUST_SRC_PATH = "${pkgs.rustPlatform.rustLibSrc}"
-            EOF
+            :lua package.path = "${self}/lua/?.lua;" .. package.path
             ''
             + nixpkgs.lib.readFile ./vimrc;
           neovim-unwrapped = pkgs.neovim-unwrapped.overrideAttrs (prev: {
@@ -59,6 +55,7 @@
                   nvim-lspconfig
                   rust-tools-nvim
                   crates-nvim
+                  fidget-nvim
                   nvim-treesitter
                   nvim-treesitter-textobjects
                 ];
