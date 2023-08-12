@@ -10,35 +10,45 @@
   outputs = { self, nixpkgs, flake-utils, ... }@inputs :
     let
       withSystems = nixpkgs.lib.genAttrs flake-utils.lib.defaultSystems;
-      vimrc = nixpkgs.lib.readFile ./vimrc;
-      luaPackagePath = '':lua package.path = "${self}/lua/?.lua;" .. package.path'';
-      requireInit = '':lua require("init")'';
     in {
 
       packages = withSystems (system:
         let
           pkgs = import nixpkgs { inherit system; };
-          join = pkgs.lib.concatStringsSep "\n";
+          dependencies = [
+              pkgs.rust-analyzer
+              pkgs.cargo
+              pkgs.rustup
+          ];
+          vimrc = ''
+            lua << EOF
+              package.path = "${self}/lua/?.lua;" .. package.path
+              rustsrc_path = "${pkgs.rustPlatform.rustLibSrc}/core/Cargo.toml"
+              vim.env.RUST_SRC_PATH = "${pkgs.rustPlatform.rustLibSrc}"
+            EOF
+            ''
+            + nixpkgs.lib.readFile ./vimrc;
+          neovim-unwrapped = pkgs.neovim-unwrapped.overrideAttrs (prev: {
+            buildInputs = pkgs.neovim-unwrapped.buildInputs ++ dependencies;
+          });
         in
         {
-          nvim = pkgs.wrapNeovim pkgs.neovim-unwrapped {
+          nvim = pkgs.wrapNeovim neovim-unwrapped {
             viAlias = true;
             vimAlias = true;
             withNodeJs = false;
             withPython3 = false;
             withRuby = false;
+            extraMakeWrapperArgs = ''--prefix PATH : "${pkgs.lib.makeBinPath dependencies}"'';
             configure = {
-              customRC = join [vimrc luaPackagePath requireInit];
+              customRC = vimrc;
 
               packages.myPlugins = {
                 start = with pkgs.vimPlugins;
                 [
                   plenary-nvim
-                  rust-tools-nvim
-                  crates-nvim
+                  nvim-tree-lua
                   vim-nix
-                  nvim-treesitter
-                  nvim-treesitter-textobjects
                   telescope-nvim
                   telescope-fzy-native-nvim
                   telescope-frecency-nvim
@@ -46,6 +56,11 @@
                   catppuccin-nvim
                   nvim-web-devicons
                   bufferline-nvim
+                  nvim-lspconfig
+                  rust-tools-nvim
+                  crates-nvim
+                  nvim-treesitter
+                  nvim-treesitter-textobjects
                 ];
               };
 	          };

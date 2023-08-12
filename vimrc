@@ -27,3 +27,5 @@ set signcolumn=yes " keep gutter open
 set ignorecase
 
 autocmd vimenter * ++nested colorscheme catppuccin
+
+:lua require('init')

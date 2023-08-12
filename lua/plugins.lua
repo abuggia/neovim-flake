@@ -1,4 +1,41 @@
 
+-- nvim-tree
+require('nvim-tree').setup({
+    on_attach = function(bufnr)
+      local api = require "nvim-tree.api"
+
+      -- default mappings
+      api.config.mappings.default_on_attach(bufnr)
+    end
+})
+
+vim.keymap.set('n', '<leader>t', '<Cmd>NvimTreeFocus<CR>', { noremap = true, silent = true, nowait = true })
+vim.keymap.set('n', '<leader>T', '<Cmd>NvimTreeToggle<CR>', { noremap = true, silent = true, nowait = true })
+
+-- Rust
+local rt = require("rust-tools")
+
+rt.setup({
+  server = {
+    on_attach = function(_, bufnr)
+      -- Hover actions
+      vim.keymap.set("n", "<C-space>", rt.hover_actions.hover_actions, { buffer = bufnr })
+      -- Code action groups
+      vim.keymap.set("n", "<leader>a", rt.code_action_group.code_action_group, { buffer = bufnr })
+    end,
+  },
+})
+
+-- Treesitter
+require('nvim-treesitter.configs').setup {
+  auto_install = false,
+  highlight = {
+    enable = true,
+    additional_vim_regex_highlighting=false,
+  },
+  ident = { enable = true }
+}
+
 -- Telescope
 require('telescope').setup {
   file_ignore_patterns = {
@@ -32,6 +69,6 @@ bufferline.setup {
   }
 }
 
-vim.keymap.set('n', '<M-,>', '<Cmd>BufferLineCyclePrev<CR>', { noremap = true, silent = true })
-vim.keymap.set('n', '<M-.>', '<Cmd>BufferLineCycleNext<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', '<M-,>', '<Cmd>BufferLineCyclePrev<CR>', { noremap = true, silent = true, nowait = true })
+vim.keymap.set('n', '<M-.>', '<Cmd>BufferLineCycleNext<CR>', { noremap = true, silent = true, nowait = true })
 
