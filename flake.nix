@@ -44,6 +44,7 @@
                 [
                   plenary-nvim
                   nvim-tree-lua
+                  bufdelete-nvim
                   vim-nix
                   telescope-nvim
                   telescope-fzy-native-nvim

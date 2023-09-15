@@ -1,39 +1,34 @@
 
 local tree = require('nvim-tree.api')
+local bufdelete = require('bufdelete')
 
 local lazy = require("bufferline.lazy")
 local bl = lazy.require('bufferline.commands')
-local bl_state = lazy.require('bufferline.state')
 
-local M = {
-  last_bl_element = nil
-}
+local last_bl_element = nil
 
-function M.toggle_nav()
-  if M.last_bl_element then
-    bl.go_to(M.last_bl_element)
-    M.last_bl_element = nil
+local function toggle_nav_focus()
+  if last_bl_element then
+    bl.go_to(last_bl_element)
+    last_bl_element = nil
   else
-    curr = bl.get_current_element_index(bl_state)
+    curr = bl.get_current_element_index(lazy.require('bufferline.state'))
     if curr then
-      M.last_bl_element = curr
-      print("got last buf: ", M.last_bl_element)
+      last_bl_element = curr
     end
-
     tree.tree.focus()
   end
 end
 
-function M.open()
-  M.last_bl_element = nil
+local function open_file()
+  last_bl_element = nil
   tree.node.open.edit()
 end
 
-function M.in_place()
-  M.last_bl_element = nil
+function in_place()
+  last_bl_element = nil
   tree.node.open.replace_tree_buffer()  
 end
-
 
 -- nvim-tree
 ------------
@@ -42,16 +37,17 @@ require('nvim-tree').setup({
       local api = require "nvim-tree.api"
 
       -- default mappings
-      api.config.mappings.default_on_attach(bufnr)
+      -- api.config.mappings.default_on_attach(bufnr)
 
       local function opts(desc)
         return { desc = 'nvim-tree: ' .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
       end
 
-      vim.keymap.set('n', '<leader>t', M.toggle_nav, { noremap = true, silent = true, nowait = true })
+      vim.keymap.set('n', '<leader>t', toggle_nav_focus, { noremap = true, silent = true, nowait = true })
+      vim.keymap.set('n', '<leader>T', '<CMD>NvimTreeToggle<CR>', { noremap = true, silent = true, nowait = true })
       vim.keymap.set('n', '<BS>',  api.node.navigate.parent_close,        opts('Close Directory'))
-      vim.keymap.set('n', '<CR>',  M.open,                                opts('Open'))
-      vim.keymap.set('n', 'O',     M.in_place,                            opts('Open: In Place'))
+      vim.keymap.set('n', '<CR>',  open_file,                             opts('Open'))
+      vim.keymap.set('n', 'O',     in_place,                              opts('Open: In Place'))
       vim.keymap.set('n', '<Tab>', api.node.open.preview,                 opts('Open Preview'))
       vim.keymap.set('n', '.',     api.node.run.cmd,                      opts('Run Command'))
       vim.keymap.set('n', '-',     api.tree.change_root_to_parent,        opts('Up'))
@@ -91,6 +87,7 @@ bufferline.setup {
 
 vim.keymap.set('n', '<M-h>', '<Cmd>BufferLineCyclePrev<CR>', { noremap = true, silent = true, nowait = true })
 vim.keymap.set('n', '<M-l>', '<Cmd>BufferLineCycleNext<CR>', { noremap = true, silent = true, nowait = true })
+vim.keymap.set('n', '<leader>w', function() bufdelete.bufdelete(0, true) end, { noremap = true, silent = true, nowait = true })
 
 -- Rust
 local rt = require("rust-tools")
