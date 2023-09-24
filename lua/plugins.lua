@@ -87,7 +87,7 @@ bufferline.setup {
 
 vim.keymap.set('n', '<M-h>', '<Cmd>BufferLineCyclePrev<CR>', { noremap = true, silent = true, nowait = true })
 vim.keymap.set('n', '<M-l>', '<Cmd>BufferLineCycleNext<CR>', { noremap = true, silent = true, nowait = true })
-vim.keymap.set('n', '<leader>w', function() bufdelete.bufdelete(0, true) end, { noremap = true, silent = true, nowait = true })
+vim.keymap.set('n', '<M-w>', function() bufdelete.bufdelete(0, true) end, { noremap = true, silent = true, nowait = true })
 
 -- Rust
 local rt = require("rust-tools")
