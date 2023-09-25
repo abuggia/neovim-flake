@@ -63,13 +63,20 @@
                   catppuccin-nvim
                   markdown-preview-nvim
                   # lsp
+                  # https://github.com/hrsh7th/nvim-cmp#setup
                   nvim-lspconfig
+                  cmp-nvim-lsp
+                  cmp-buffer
+                  cmp-path
+                  cmp-cmdline
+                  nvim-cmp
+
                   rust-tools-nvim
                   crates-nvim
                   fidget-nvim
                   vim-nix
                   # tree sitter
-                  nvim-treesitter
+                  nvim-treesitter.withAllGrammars
                   nvim-treesitter-textobjects
                 ];
               };

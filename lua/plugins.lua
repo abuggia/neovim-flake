@@ -68,7 +68,6 @@ require('nvim-tree').setup({
 })
 
 
-
 -- Bufferline
 ------------
 local bufferline = require('bufferline')
@@ -89,10 +88,35 @@ vim.keymap.set('n', '<M-h>', '<Cmd>BufferLineCyclePrev<CR>', { noremap = true, s
 vim.keymap.set('n', '<M-l>', '<Cmd>BufferLineCycleNext<CR>', { noremap = true, silent = true, nowait = true })
 vim.keymap.set('n', '<M-w>', function() bufdelete.bufdelete(0, true) end, { noremap = true, silent = true, nowait = true })
 
--- LSPs
-lspconfig = require('lspconfig')
+-- autocomplete
+local cmp = require("cmp")
+cmp.setup({
+  sources = cmp.config.sources({
+    { name = "nvim_lsp" },
+  }),
+})
 
-lspconfig .svelte.setup{}
+-- LSPs
+local capabilities = require("cmp_nvim_lsp").default_capabilities()
+local lspconfig = require("lspconfig")
+
+lspconfig.svelte.setup({
+  capabilities = capabilities,
+  on_attach = function(client, bufnr)
+    vim.api.nvim_create_autocmd("BufWritePost", {
+      pattern = { "*.js", "*.ts" },
+      callback = function(ctx)
+        if client.name == "svelte" then
+          client.notify("$/onDidChangeTsOrJsFile", { uri = ctx.file })
+        end
+      end,
+    })
+  end,
+})
+
+lspconfig.tailwindcss.setup({
+  capabilities = capabilities,
+})
 
 -- Rust
 local rt = require("rust-tools")
@@ -111,14 +135,14 @@ rt.setup({
 require("fidget").setup()
 
 -- Treesitter
-require('nvim-treesitter.configs').setup {
+require('nvim-treesitter.configs').setup({
   auto_install = false,
   highlight = {
     enable = true,
     additional_vim_regex_highlighting=false,
   },
-  ident = { enable = true }
-}
+  ident = { enable = true },
+})
 
 -- Telescope
 require('telescope').setup {
