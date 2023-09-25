@@ -23,7 +23,7 @@ set expandtab
 set tabstop=2
 set shiftwidth=2
 set clipboard+=unnamedplus
-set signcolumn=yes " keep gutter open
+set signcolumn=yes
 set ignorecase
 
 autocmd vimenter * ++nested colorscheme catppuccin

@@ -15,10 +15,20 @@
       packages = withSystems (system:
         let
           pkgs = import nixpkgs { inherit system; };
-          dependencies = [
-              pkgs.rust-analyzer
-              pkgs.cargo
-              pkgs.rustup
+          dependencies = with pkgs; [
+              rust-analyzer
+              cargo
+              rustup
+              zk
+              nil
+              lua-language-server
+              nodePackages.svelte-language-server
+              nodePackages."@tailwindcss/language-server"
+              ruff
+              black
+              rustfmt
+              cargo
+              rustc
           ];
           vimrc = ''
             :lua package.path = "${self}/lua/?.lua;" .. package.path
@@ -42,21 +52,23 @@
               packages.myPlugins = {
                 start = with pkgs.vimPlugins;
                 [
-                  plenary-nvim
-                  nvim-tree-lua
-                  bufdelete-nvim
-                  vim-nix
+                  plenary-nvim 
                   telescope-nvim
                   telescope-fzy-native-nvim
                   telescope-frecency-nvim
-                  markdown-preview-nvim
-                  catppuccin-nvim
-                  nvim-web-devicons
                   bufferline-nvim
+                  bufdelete-nvim
+                  nvim-tree-lua
+                  nvim-web-devicons
+                  catppuccin-nvim
+                  markdown-preview-nvim
+                  # lsp
                   nvim-lspconfig
                   rust-tools-nvim
                   crates-nvim
                   fidget-nvim
+                  vim-nix
+                  # tree sitter
                   nvim-treesitter
                   nvim-treesitter-textobjects
                 ];
