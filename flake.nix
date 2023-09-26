@@ -70,6 +70,7 @@
                   cmp-path
                   cmp-cmdline
                   nvim-cmp
+                  dressing-nvim
 
                   rust-tools-nvim
                   crates-nvim
