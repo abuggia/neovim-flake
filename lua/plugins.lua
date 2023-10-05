@@ -90,6 +90,7 @@ vim.keymap.set('n', '<M-w>', function() bufdelete.bufdelete(0, true) end, { nore
 
 -- autocomplete
 local cmp = require("cmp")
+local lspkind = require("lspkind")
 cmp.setup({
   completion = {
     completeopt = "menu,menuone,preview,noselect",
@@ -99,17 +100,21 @@ cmp.setup({
     { name = "path" },
     { name = "nvim_lsp" },
   }),
-  --[[
   mapping = cmp.mapping.preset.insert({
-    ["<C-k>"] = cmp.mapping.select_prev_item(), -- previous suggestion
-    ["<C-j>"] = cmp.mapping.select_next_item(), -- next suggestion
-    ["<C-b>"] = cmp.mapping.scroll_docs(-4),
-    ["<C-f>"] = cmp.mapping.scroll_docs(4),
-    ["<C-Space>"] = cmp.mapping.complete(), -- show completion suggestions
-    ["<C-e>"] = cmp.mapping.abort(), -- close completion window
+    ["<M-k>"] = cmp.mapping.select_prev_item(), -- previous suggestion
+    ["<M-j>"] = cmp.mapping.select_next_item(), -- next suggestion
+    ["<M-b>"] = cmp.mapping.scroll_docs(-4),
+    ["<M-f>"] = cmp.mapping.scroll_docs(4),
+    ["<M-Space>"] = cmp.mapping.complete(), -- show completion suggestions
+    ["<M-e>"] = cmp.mapping.abort(), -- close completion window
     ["<CR>"] = cmp.mapping.confirm({ select = false }),
   }),
-    ]]--
+  formatting = {
+    format = lspkind.cmp_format({
+      maxwidth = 50,
+      ellipsis_char = "...",
+    }),
+  },
 })
 
 -- LSPs
@@ -158,6 +163,15 @@ require('nvim-treesitter.configs').setup({
     additional_vim_regex_highlighting=false,
   },
   ident = { enable = true },
+  incremental_selection = {
+    enable = true,
+    keymaps = {
+      init_selection = "<C-space>",
+      node_incremental = "<C-space>",
+      scope_incremental = false,
+      node_decremental = "<bs>",
+    },
+  },
 })
 
 -- Telescope

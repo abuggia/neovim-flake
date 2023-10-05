@@ -71,6 +71,7 @@
                   cmp-cmdline
                   nvim-cmp
                   dressing-nvim
+                  lspkind-nvim
 
                   rust-tools-nvim
                   crates-nvim
