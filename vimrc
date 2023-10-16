@@ -1,5 +1,4 @@
 let mapleader = " "
-inoremap kj <esc>
 nnoremap <leader>s :w<cr>
 nnoremap <leader>q :q<cr>
 noremap <leader>e :Ex<cr>
@@ -17,7 +16,7 @@ set autoread
 set nohlsearch
 set incsearch
 set termguicolors
-set scrolloff=8
+set scrolloff=5
 set updatetime=300
 set expandtab
 set tabstop=2
