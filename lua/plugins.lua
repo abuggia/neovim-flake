@@ -96,7 +96,7 @@ cmp.setup({
     completeopt = "menu,menuone,preview,noselect",
   },
   sources = cmp.config.sources({
-    { name = "buffer" },
+ -- { name = "buffer" },
     { name = "path" },
     { name = "nvim_lsp" },
   }),
@@ -139,6 +139,14 @@ lspconfig.tailwindcss.setup({
   capabilities = capabilities,
 })
 
+lspconfig.terraformls.setup({
+  capabilities = capabilities,
+})
+
+lspconfig.tflint.setup({
+  capabilities = capabilities,
+})
+
 -- Rust
 local rt = require("rust-tools")
 
@@ -149,6 +157,7 @@ rt.setup({
       vim.keymap.set("n", "<leader>a", rt.code_action_group.code_action_group, { buffer = bufnr })
       -- todo: does this belong somewhere else?
       vim.keymap.set("n", "gd", vim.lsp.buf.definition, { buffer = bufnr })
+      vim.keymap.set("n", "rn", vim.lsp.buf.rename, { buffer = bufnr })
     end,
   },
 })

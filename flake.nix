@@ -24,6 +24,8 @@
               lua-language-server
               nodePackages.svelte-language-server
               nodePackages."@tailwindcss/language-server"
+              terraform-ls
+              tflint
               ruff
               black
               rustfmt
@@ -72,7 +74,6 @@
                   nvim-cmp
                   dressing-nvim
                   lspkind-nvim
-
                   rust-tools-nvim
                   crates-nvim
                   fidget-nvim
