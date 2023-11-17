@@ -44,7 +44,7 @@
           nvim = pkgs.wrapNeovim neovim-unwrapped {
             viAlias = true;
             vimAlias = true;
-            withNodeJs = false;
+            withNodeJs = true;
             withPython3 = false;
             withRuby = false;
             extraMakeWrapperArgs = ''--prefix PATH : "${pkgs.lib.makeBinPath dependencies}"'';
@@ -81,6 +81,9 @@
                   # tree sitter
                   nvim-treesitter.withAllGrammars
                   nvim-treesitter-textobjects
+                  copilot-lua
+                  copilot-cmp
+                  vim-just
                 ];
               };
 	          };

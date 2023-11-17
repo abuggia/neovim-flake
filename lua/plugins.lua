@@ -260,6 +260,18 @@ require('nvim-treesitter.configs').setup({
   },
 })
 
+-- 
+require('copilot').setup({
+  filetypes = {
+    sh = function ()
+      if string.match(vim.fs.basename(vim.api.nvim_buf_get_name(0)), '^%.env.*') then
+        return false
+      end
+      return true
+    end,
+  },
+})
+
 -- Telescope
 require('telescope').setup {
   file_ignore_patterns = {
