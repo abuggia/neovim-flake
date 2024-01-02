@@ -2,6 +2,7 @@ let mapleader = " "
 nnoremap <leader>s :w<cr>
 nnoremap <leader>q :q<cr>
 noremap <leader>e :Ex<cr>
+nnoremap <C-p> :MarkdownPreview<cr>
 
 " navigate by displayed line vs physical line
 noremap <silent> k gk

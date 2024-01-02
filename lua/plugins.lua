@@ -260,7 +260,7 @@ require('nvim-treesitter.configs').setup({
   },
 })
 
--- 
+-- Copilot
 require('copilot').setup({
   filetypes = {
     sh = function ()
