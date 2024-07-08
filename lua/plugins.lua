@@ -1,4 +1,6 @@
 
+require('follow-md-links')
+
 local tree = require('nvim-tree.api')
 local bufdelete = require('bufdelete')
 

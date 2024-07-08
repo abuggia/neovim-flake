@@ -74,6 +74,7 @@
                   nvim-web-devicons
                   catppuccin-nvim
                   markdown-preview-nvim
+                  follow-md-links
                   # lsp
                   # https://github.com/hrsh7th/nvim-cmp#setup
                   nvim-lspconfig
