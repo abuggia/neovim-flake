@@ -39,6 +39,16 @@
           neovim-unwrapped = pkgs.neovim-unwrapped.overrideAttrs (prev: {
             buildInputs = pkgs.neovim-unwrapped.buildInputs ++ dependencies;
           });
+          # `nurl https://github.com/jghauser/follow-md-links.nvim 2>/dev/null`
+          follow-md-links = pkgs.vimUtils.buildVimPlugin {
+            name = "follow-md-links";
+            src = pkgs.fetchFromGitHub {
+              owner = "jghauser";
+              repo = "follow-md-links.nvim";
+              rev = "cf081a0a8e93dd188241a570b9a700b6a546ad1c";
+              hash = "sha256-ElgYrD+5FItPftpjDTdKAQR37XBkU8mZXs7EmAwEKJ4=";
+            };
+          };
         in
         {
           nvim = pkgs.wrapNeovim neovim-unwrapped {
