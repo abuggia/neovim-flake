@@ -25,6 +25,7 @@ set shiftwidth=2
 set clipboard+=unnamedplus
 set signcolumn=yes
 set ignorecase
+set cole=2
 
 autocmd vimenter * ++nested colorscheme catppuccin
 
