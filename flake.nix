@@ -31,6 +31,7 @@
               rustfmt
               cargo
               rustc
+              clang-tools
           ];
           vimrc = ''
             :lua package.path = "${self}/lua/?.lua;" .. package.path

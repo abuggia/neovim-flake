@@ -149,6 +149,35 @@ lspconfig.tflint.setup({
   capabilities = capabilities,
 })
 
+lspconfig.clangd.setup({
+  capabilities = capabilities,
+  init_options = {
+      -- cmake can generate `compile_commands.json` but it goes in the build dir
+      compilationDatabasePath = 'build'
+  }
+})
+
+-- Set up a group for LSP-related autocommands
+local lsp_augroup = vim.api.nvim_create_augroup("LspFormatting", { clear = true })
+
+-- Autocommand to run upon LSP client attachment
+vim.api.nvim_create_autocmd("LspAttach", {
+    group = lsp_augroup,
+    callback = function(args)
+        local client = vim.lsp.get_client_by_id(args.data.client_id)
+        -- Ensure the attached client supports formatting
+        if client and client.server_capabilities.documentFormattingProvider then
+            -- Set up format on save (optional but recommended)
+            vim.api.nvim_create_autocmd("BufWritePre", {
+                buffer = args.buf,
+                callback = function()
+                    vim.lsp.buf.format { async = false }
+                end,
+            })
+        end
+    end,
+})
+
 -- Rust
 local rt = require("rust-tools")
 
@@ -259,18 +288,6 @@ require('nvim-treesitter.configs').setup({
         ["[L"] = { query = "@loop.outer", desc = "Prev loop end" },
       },
     },
-  },
-})
-
--- Copilot
-require('copilot').setup({
-  filetypes = {
-    sh = function ()
-      if string.match(vim.fs.basename(vim.api.nvim_buf_get_name(0)), '^%.env.*') then
-        return false
-      end
-      return true
-    end,
   },
 })
 
