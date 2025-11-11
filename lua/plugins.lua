@@ -160,10 +160,13 @@ lspconfig.clangd.setup({
 -- Set up a group for LSP-related autocommands
 local lsp_augroup = vim.api.nvim_create_augroup("LspFormatting", { clear = true })
 
+
 -- Autocommand to run upon LSP client attachment
 vim.api.nvim_create_autocmd("LspAttach", {
     group = lsp_augroup,
     callback = function(args)
+        vim.keymap.set('n','gd',vim.lsp.buf.definition,{buffer=args.buf;});
+
         local client = vim.lsp.get_client_by_id(args.data.client_id)
         -- Ensure the attached client supports formatting
         if client and client.server_capabilities.documentFormattingProvider then
