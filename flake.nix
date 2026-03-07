@@ -50,8 +50,6 @@
               hash = "sha256-ElgYrD+5FItPftpjDTdKAQR37XBkU8mZXs7EmAwEKJ4=";
             };
           };
-        in
-        {
           nvim = pkgs.wrapNeovim neovim-unwrapped {
             viAlias = true;
             vimAlias = true;
@@ -99,17 +97,23 @@
                 ];
               };
 	          };
+          };
+        in
+        {
+          inherit nvim;
+          default = nvim;
+        });
+
+      apps = withSystems (system: {
+        default = {
+          type = "app";
+          program = "${self.packages.${system}.default}/bin/nvim";
         };
       });
 
-      defaultPackage = withSystems (system: self.packages.${system}.nvim);
-
-      defaultApp = withSystems (sys: {
-        type = "app";
-        program = "${self.defaultPackage."${sys}"}/bin/nvim";
-      });
-
-      overlay = final: prev: { adam-neovim = prev.pkgs.callPackage ./. { }; };
+      overlays = {
+        default = final: prev: { adam-neovim = prev.pkgs.callPackage ./. { }; };
+      };
     };
 
 }
