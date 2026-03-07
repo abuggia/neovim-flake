@@ -86,7 +86,7 @@
                   nvim-cmp
                   dressing-nvim
                   lspkind-nvim
-                  rust-tools-nvim
+                  rustaceanvim
                   crates-nvim
                   fidget-nvim
                   vim-nix

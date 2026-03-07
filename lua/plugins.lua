@@ -181,20 +181,18 @@ vim.api.nvim_create_autocmd("LspAttach", {
     end,
 })
 
--- Rust
-local rt = require("rust-tools")
-
-rt.setup({
+-- Rust (rustaceanvim)
+vim.g.rustaceanvim = {
   server = {
+    capabilities = capabilities,
     on_attach = function(_, bufnr)
-      vim.keymap.set("n", "<C-space>", rt.hover_actions.hover_actions, { buffer = bufnr })
-      vim.keymap.set("n", "<leader>a", rt.code_action_group.code_action_group, { buffer = bufnr })
-      -- todo: does this belong somewhere else?
+      vim.keymap.set("n", "<C-space>", vim.lsp.buf.hover, { buffer = bufnr })
+      vim.keymap.set("n", "<leader>a", vim.lsp.buf.code_action, { buffer = bufnr })
       vim.keymap.set("n", "gd", vim.lsp.buf.definition, { buffer = bufnr })
       vim.keymap.set("n", "rn", vim.lsp.buf.rename, { buffer = bufnr })
     end,
   },
-})
+}
 
 require("fidget").setup()
 
@@ -310,5 +308,4 @@ require('telescope').load_extension 'fzy_native'
 
 vim.keymap.set('n', '<leader>f', require('telescope.builtin').find_files, { desc = '[S]earch [F]iles' })
 vim.keymap.set('n', '<leader>g', require('telescope.builtin').live_grep, { desc = '[S]earch by [G]rep' })
-
 
