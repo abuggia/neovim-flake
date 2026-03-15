@@ -40,26 +40,6 @@
           neovim-unwrapped = pkgs.neovim-unwrapped.overrideAttrs (prev: {
             buildInputs = pkgs.neovim-unwrapped.buildInputs ++ dependencies;
           });
-          # `nurl https://github.com/jghauser/follow-md-links.nvim 2>/dev/null`
-          follow-md-links = pkgs.vimUtils.buildVimPlugin {
-            name = "follow-md-links";
-            src = pkgs.fetchFromGitHub {
-              owner = "jghauser";
-              repo = "follow-md-links.nvim";
-              rev = "cf081a0a8e93dd188241a570b9a700b6a546ad1c";
-              hash = "sha256-ElgYrD+5FItPftpjDTdKAQR37XBkU8mZXs7EmAwEKJ4=";
-            };
-            postPatch = ''
-              substituteInPlace lua/follow-md-links.lua \
-                --replace-fail 'local ts_utils = require("nvim-treesitter.ts_utils")' 'local function ts_utils()
-                  return require("nvim-treesitter.ts_utils")
-                end' \
-                --replace-fail 'ts_utils.get_node_at_cursor()' 'ts_utils().get_node_at_cursor()' \
-                --replace-fail 'ts_utils.get_next_node(node_at_cursor)' 'ts_utils().get_next_node(node_at_cursor)' \
-                --replace-fail 'ts_utils.get_named_children(node_at_cursor)' 'ts_utils().get_named_children(node_at_cursor)'
-            '';
-            dependencies = [ pkgs.vimPlugins.nvim-treesitter ];
-          };
           nvim = pkgs.wrapNeovim neovim-unwrapped {
             viAlias = true;
             vimAlias = true;
@@ -83,7 +63,6 @@
                   nvim-web-devicons
                   catppuccin-nvim
                   markdown-preview-nvim
-                  follow-md-links
                   # lsp
                   # https://github.com/hrsh7th/nvim-cmp#setup
                   nvim-lspconfig

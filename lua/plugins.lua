@@ -1,5 +1,5 @@
 
-require('follow-md-links')
+local follow_md_links = require('follow-md-links')
 
 local tree = require('nvim-tree.api')
 local bufdelete = require('bufdelete')
@@ -8,6 +8,17 @@ local lazy = require("bufferline.lazy")
 local bl = lazy.require('bufferline.commands')
 
 local last_bl_element = nil
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "markdown",
+  callback = function(args)
+    vim.keymap.set("n", "<CR>", follow_md_links.follow_link, {
+      buffer = args.buf,
+      noremap = true,
+      silent = true,
+    })
+  end,
+})
 
 local function toggle_nav_focus()
   if last_bl_element then
