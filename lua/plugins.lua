@@ -1,5 +1,5 @@
 
-require('follow-md-links')
+local follow_md_links = require('follow-md-links')
 
 local tree = require('nvim-tree.api')
 local bufdelete = require('bufdelete')
@@ -8,6 +8,17 @@ local lazy = require("bufferline.lazy")
 local bl = lazy.require('bufferline.commands')
 
 local last_bl_element = nil
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "markdown",
+  callback = function(args)
+    vim.keymap.set("n", "<CR>", follow_md_links.follow_link, {
+      buffer = args.buf,
+      noremap = true,
+      silent = true,
+    })
+  end,
+})
 
 local function toggle_nav_focus()
   if last_bl_element then
@@ -121,36 +132,30 @@ cmp.setup({
 
 -- LSPs
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
-local lspconfig = require("lspconfig")
+local function enable_lsp(server, config)
+  vim.lsp.config(server, vim.tbl_deep_extend("force", {
+    capabilities = capabilities,
+  }, config or {}))
+  vim.lsp.enable(server)
+end
 
-lspconfig.svelte.setup({
-  capabilities = capabilities,
-  on_attach = function(client, bufnr)
+enable_lsp("svelte", {
+  on_attach = function(client, _)
     vim.api.nvim_create_autocmd("BufWritePost", {
       pattern = { "*.js", "*.ts" },
       callback = function(ctx)
         if client.name == "svelte" then
-          client.notify("$/onDidChangeTsOrJsFile", { uri = ctx.file })
+          client:notify("$/onDidChangeTsOrJsFile", { uri = vim.uri_from_fname(ctx.match) })
         end
       end,
     })
   end,
 })
 
-lspconfig.tailwindcss.setup({
-  capabilities = capabilities,
-})
-
-lspconfig.terraformls.setup({
-  capabilities = capabilities,
-})
-
-lspconfig.tflint.setup({
-  capabilities = capabilities,
-})
-
-lspconfig.clangd.setup({
-  capabilities = capabilities,
+enable_lsp("tailwindcss")
+enable_lsp("terraformls")
+enable_lsp("tflint")
+enable_lsp("clangd", {
   init_options = {
       -- cmake can generate `compile_commands.json` but it goes in the build dir
       compilationDatabasePath = 'build'
@@ -169,7 +174,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
         local client = vim.lsp.get_client_by_id(args.data.client_id)
         -- Ensure the attached client supports formatting
-        if client and client.server_capabilities.documentFormattingProvider then
+        if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_formatting) then
             -- Set up format on save (optional but recommended)
             vim.api.nvim_create_autocmd("BufWritePre", {
                 buffer = args.buf,
@@ -197,100 +202,85 @@ vim.g.rustaceanvim = {
 require("fidget").setup()
 
 -- Treesitter
-require('nvim-treesitter.configs').setup({
-  auto_install = false,
-  highlight = {
-    enable = true,
-    additional_vim_regex_highlighting=false,
+vim.api.nvim_create_autocmd("FileType", {
+  callback = function(args)
+    if vim.bo[args.buf].buftype ~= "" then
+      return
+    end
+
+    pcall(vim.treesitter.start, args.buf)
+  end,
+})
+
+require("nvim-treesitter-textobjects").setup({
+  select = {
+    lookahead = true,
   },
-  ident = { enable = true },
-  incremental_selection = {
-    enable = true,
-    keymaps = {
-      init_selection = "<C-space>",
-      node_incremental = "<C-space>",
-      scope_incremental = false,
-      node_decremental = "<bs>",
-    },
-  },
-  textobjects = {
-    select = {
-      enable = true,
-
-      -- Automatically jump forward to textobj, similar to targets.vim
-      lookahead = true,
-
-      keymaps = {
-        -- You can use the capture groups defined in textobjects.scm
-        ["a="] = { query = "@assignment.outer", desc = "Select outer part of an assignment" },
-        ["i="] = { query = "@assignment.inner", desc = "Select inner part of an assignment" },
-        ["l="] = { query = "@assignment.lhs", desc = "Select left hand side of an assignment" },
-        ["r="] = { query = "@assignment.rhs", desc = "Select right hand side of an assignment" },
-
-        -- works for javascript/typescript files (custom capture I created in after/queries/ecma/textobjects.scm)
-        ["a:"] = { query = "@property.outer", desc = "Select outer part of an object property" },
-        ["i:"] = { query = "@property.inner", desc = "Select inner part of an object property" },
-        ["l:"] = { query = "@property.lhs", desc = "Select left part of an object property" },
-        ["r:"] = { query = "@property.rhs", desc = "Select right part of an object property" },
-
-        ["aa"] = { query = "@parameter.outer", desc = "Select outer part of a parameter/argument" },
-        ["ia"] = { query = "@parameter.inner", desc = "Select inner part of a parameter/argument" },
-
-        ["ai"] = { query = "@conditional.outer", desc = "Select outer part of a conditional" },
-        ["ii"] = { query = "@conditional.inner", desc = "Select inner part of a conditional" },
-
-        ["al"] = { query = "@loop.outer", desc = "Select outer part of a loop" },
-        ["il"] = { query = "@loop.inner", desc = "Select inner part of a loop" },
-
-        ["af"] = { query = "@call.outer", desc = "Select outer part of a function call" },
-        ["if"] = { query = "@call.inner", desc = "Select inner part of a function call" },
-
-        ["am"] = { query = "@function.outer", desc = "Select outer part of a method/function definition" },
-        ["im"] = { query = "@function.inner", desc = "Select inner part of a method/function definition" },
-
-        ["ac"] = { query = "@class.outer", desc = "Select outer part of a class" },
-        ["ic"] = { query = "@class.inner", desc = "Select inner part of a class" },
-      },
-    },
-    move = {
-      enable = true,
-      set_jumps = true, -- whether to set jumps in the jumplist
-      goto_next_start = {
-        ["]f"] = { query = "@call.outer", desc = "Next function call start" },
-        ["]m"] = { query = "@function.outer", desc = "Next method/function def start" },
-        ["]c"] = { query = "@class.outer", desc = "Next class start" },
-        ["]i"] = { query = "@conditional.outer", desc = "Next conditional start" },
-        ["]l"] = { query = "@loop.outer", desc = "Next loop start" },
-
-        -- You can pass a query group to use query from `queries/<lang>/<query_group>.scm file in your runtime path.
-        -- Below example nvim-treesitter's `locals.scm` and `folds.scm`. They also provide highlights.scm and indent.scm.
-        ["]s"] = { query = "@scope", query_group = "locals", desc = "Next scope" },
-        ["]z"] = { query = "@fold", query_group = "folds", desc = "Next fold" },
-      },
-      goto_next_end = {
-        ["]F"] = { query = "@call.outer", desc = "Next function call end" },
-        ["]M"] = { query = "@function.outer", desc = "Next method/function def end" },
-        ["]C"] = { query = "@class.outer", desc = "Next class end" },
-        ["]I"] = { query = "@conditional.outer", desc = "Next conditional end" },
-        ["]L"] = { query = "@loop.outer", desc = "Next loop end" },
-      },
-      goto_previous_start = {
-        ["[f"] = { query = "@call.outer", desc = "Prev function call start" },
-        ["[m"] = { query = "@function.outer", desc = "Prev method/function def start" },
-        ["[c"] = { query = "@class.outer", desc = "Prev class start" },
-        ["[i"] = { query = "@conditional.outer", desc = "Prev conditional start" },
-        ["[l"] = { query = "@loop.outer", desc = "Prev loop start" },
-      },
-      goto_previous_end = {
-        ["[F"] = { query = "@call.outer", desc = "Prev function call end" },
-        ["[M"] = { query = "@function.outer", desc = "Prev method/function def end" },
-        ["[C"] = { query = "@class.outer", desc = "Prev class end" },
-        ["[I"] = { query = "@conditional.outer", desc = "Prev conditional end" },
-        ["[L"] = { query = "@loop.outer", desc = "Prev loop end" },
-      },
-    },
+  move = {
+    set_jumps = true,
   },
 })
+
+local ts_select = require("nvim-treesitter-textobjects.select")
+local ts_move = require("nvim-treesitter-textobjects.move")
+
+local select_keymaps = {
+  ["a="] = { query = "@assignment.outer", desc = "Select outer part of an assignment" },
+  ["i="] = { query = "@assignment.inner", desc = "Select inner part of an assignment" },
+  ["l="] = { query = "@assignment.lhs", desc = "Select left hand side of an assignment" },
+  ["r="] = { query = "@assignment.rhs", desc = "Select right hand side of an assignment" },
+  ["a:"] = { query = "@property.outer", desc = "Select outer part of an object property" },
+  ["i:"] = { query = "@property.inner", desc = "Select inner part of an object property" },
+  ["l:"] = { query = "@property.lhs", desc = "Select left part of an object property" },
+  ["r:"] = { query = "@property.rhs", desc = "Select right part of an object property" },
+  ["aa"] = { query = "@parameter.outer", desc = "Select outer part of a parameter/argument" },
+  ["ia"] = { query = "@parameter.inner", desc = "Select inner part of a parameter/argument" },
+  ["ai"] = { query = "@conditional.outer", desc = "Select outer part of a conditional" },
+  ["ii"] = { query = "@conditional.inner", desc = "Select inner part of a conditional" },
+  ["al"] = { query = "@loop.outer", desc = "Select outer part of a loop" },
+  ["il"] = { query = "@loop.inner", desc = "Select inner part of a loop" },
+  ["af"] = { query = "@call.outer", desc = "Select outer part of a function call" },
+  ["if"] = { query = "@call.inner", desc = "Select inner part of a function call" },
+  ["am"] = { query = "@function.outer", desc = "Select outer part of a method/function definition" },
+  ["im"] = { query = "@function.inner", desc = "Select inner part of a method/function definition" },
+  ["ac"] = { query = "@class.outer", desc = "Select outer part of a class" },
+  ["ic"] = { query = "@class.inner", desc = "Select inner part of a class" },
+}
+
+for lhs, mapping in pairs(select_keymaps) do
+  vim.keymap.set({ "x", "o" }, lhs, function()
+    ts_select.select_textobject(mapping.query, mapping.query_group or "textobjects")
+  end, { desc = mapping.desc })
+end
+
+local function set_ts_move(mode, lhs, query, query_group, desc)
+  vim.keymap.set({ "n", "x", "o" }, lhs, function()
+    ts_move[mode](query, query_group or "textobjects")
+  end, { desc = desc })
+end
+
+set_ts_move("goto_next_start", "]f", "@call.outer", nil, "Next function call start")
+set_ts_move("goto_next_start", "]m", "@function.outer", nil, "Next method/function def start")
+set_ts_move("goto_next_start", "]c", "@class.outer", nil, "Next class start")
+set_ts_move("goto_next_start", "]i", "@conditional.outer", nil, "Next conditional start")
+set_ts_move("goto_next_start", "]l", "@loop.outer", nil, "Next loop start")
+set_ts_move("goto_next_start", "]s", "@scope", "locals", "Next scope")
+set_ts_move("goto_next_start", "]z", "@fold", "folds", "Next fold")
+set_ts_move("goto_next_end", "]F", "@call.outer", nil, "Next function call end")
+set_ts_move("goto_next_end", "]M", "@function.outer", nil, "Next method/function def end")
+set_ts_move("goto_next_end", "]C", "@class.outer", nil, "Next class end")
+set_ts_move("goto_next_end", "]I", "@conditional.outer", nil, "Next conditional end")
+set_ts_move("goto_next_end", "]L", "@loop.outer", nil, "Next loop end")
+set_ts_move("goto_previous_start", "[f", "@call.outer", nil, "Prev function call start")
+set_ts_move("goto_previous_start", "[m", "@function.outer", nil, "Prev method/function def start")
+set_ts_move("goto_previous_start", "[c", "@class.outer", nil, "Prev class start")
+set_ts_move("goto_previous_start", "[i", "@conditional.outer", nil, "Prev conditional start")
+set_ts_move("goto_previous_start", "[l", "@loop.outer", nil, "Prev loop start")
+set_ts_move("goto_previous_end", "[F", "@call.outer", nil, "Prev function call end")
+set_ts_move("goto_previous_end", "[M", "@function.outer", nil, "Prev method/function def end")
+set_ts_move("goto_previous_end", "[C", "@class.outer", nil, "Prev class end")
+set_ts_move("goto_previous_end", "[I", "@conditional.outer", nil, "Prev conditional end")
+set_ts_move("goto_previous_end", "[L", "@loop.outer", nil, "Prev loop end")
 
 -- Telescope
 require('telescope').setup {
@@ -308,4 +298,3 @@ require('telescope').load_extension 'fzy_native'
 
 vim.keymap.set('n', '<leader>f', require('telescope.builtin').find_files, { desc = '[S]earch [F]iles' })
 vim.keymap.set('n', '<leader>g', require('telescope.builtin').live_grep, { desc = '[S]earch by [G]rep' })
-
