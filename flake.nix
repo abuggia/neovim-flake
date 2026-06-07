@@ -22,8 +22,8 @@
               zk
               nil
               lua-language-server
-              nodePackages.svelte-language-server
-              nodePackages."@tailwindcss/language-server"
+              svelte-language-server
+              tailwindcss-language-server
               terraform-ls
               tflint
               ruff
