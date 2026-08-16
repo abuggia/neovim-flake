@@ -80,8 +80,6 @@
                   # tree sitter
                   nvim-treesitter.withAllGrammars
                   nvim-treesitter-textobjects
-                  copilot-lua
-                  copilot-cmp
                   vim-just
                 ];
               };
