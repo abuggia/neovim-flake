@@ -40,3 +40,12 @@ vim.keymap.set('n', '<leader>w', function() bufdelete.bufdelete(0, true) end, { 
 
 vim.keymap.set('n', '<leader>f', require('telescope.builtin').find_files, { desc = '[S]earch [F]iles' })
 vim.keymap.set('n', '<leader>g', require('telescope.builtin').live_grep, { desc = '[S]earch by [G]rep' })
+
+## claude
+
+  - `<leader>cc` - toggle claude terminal (or run `/ide` in a claude started elsewhere in the same dir)
+  - `<leader>cf` - focus claude terminal
+  - `<leader>cs` - send visual selection to claude (on nav: add file under cursor)
+  - `<leader>cb` - add current buffer to claude
+  - `<leader>ca` / `<leader>cd` - accept / deny a proposed diff (`:w` / `:q` also work)
+  - `<C-\><C-n>` - leave the claude terminal for normal mode

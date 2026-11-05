@@ -78,6 +78,8 @@
                   nvim-treesitter.withAllGrammars
                   nvim-treesitter-textobjects
                   vim-just
+                  # claude code ide integration
+                  claudecode-nvim
                 ];
               };
 	          };
