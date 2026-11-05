@@ -18,7 +18,6 @@
           dependencies = with pkgs; [
               rust-analyzer
               cargo
-              rustup
               zk
               nil
               lua-language-server
@@ -43,7 +42,7 @@
             withNodeJs = true;
             withPython3 = false;
             withRuby = false;
-            extraMakeWrapperArgs = ''--prefix PATH : "${pkgs.lib.makeBinPath dependencies}"'';
+            extraMakeWrapperArgs = ''--suffix PATH : "${pkgs.lib.makeBinPath dependencies}"'';
             configure = {
               customRC = vimrc;
 
