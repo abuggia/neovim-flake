@@ -37,10 +37,7 @@
             :lua package.path = "${self}/lua/?.lua;" .. package.path
             ''
             + nixpkgs.lib.readFile ./vimrc;
-          neovim-unwrapped = pkgs.neovim-unwrapped.overrideAttrs (prev: {
-            buildInputs = pkgs.neovim-unwrapped.buildInputs ++ dependencies;
-          });
-          nvim = pkgs.wrapNeovim neovim-unwrapped {
+          nvim = pkgs.wrapNeovim pkgs.neovim-unwrapped {
             viAlias = true;
             vimAlias = true;
             withNodeJs = true;
