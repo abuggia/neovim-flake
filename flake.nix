@@ -42,8 +42,6 @@
             withNodeJs = true;
             withPython3 = false;
             withRuby = false;
-            # suffix, not prefix: a project's dev shell toolchain (rustc, cargo,
-            # rust-analyzer, clangd, ...) should win; these are fallbacks.
             extraMakeWrapperArgs = ''--suffix PATH : "${pkgs.lib.makeBinPath dependencies}"'';
             configure = {
               customRC = vimrc;
