@@ -18,7 +18,6 @@
           dependencies = with pkgs; [
               rust-analyzer
               cargo
-              rustup
               zk
               nil
               lua-language-server
@@ -43,7 +42,9 @@
             withNodeJs = true;
             withPython3 = false;
             withRuby = false;
-            extraMakeWrapperArgs = ''--prefix PATH : "${pkgs.lib.makeBinPath dependencies}"'';
+            # suffix, not prefix: a project's dev shell toolchain (rustc, cargo,
+            # rust-analyzer, clangd, ...) should win; these are fallbacks.
+            extraMakeWrapperArgs = ''--suffix PATH : "${pkgs.lib.makeBinPath dependencies}"'';
             configure = {
               customRC = vimrc;
 
