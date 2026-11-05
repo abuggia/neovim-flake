@@ -74,6 +74,7 @@ require('nvim-tree').setup({
       vim.keymap.set('n', '<C-r>', api.tree.reload,                       opts('Refresh'))
       vim.keymap.set('n', 'W',     api.tree.collapse_all,                 opts('Collapse'))
       vim.keymap.set('n', 'y',     api.fs.copy.filename,                  opts('Copy Name'))
+      vim.keymap.set('n', '<leader>cs', '<Cmd>ClaudeCodeTreeAdd<CR>',     opts('Add to Claude'))
       
     end,
 
@@ -298,3 +299,16 @@ require('telescope').load_extension 'fzy_native'
 
 vim.keymap.set('n', '<leader>f', require('telescope.builtin').find_files, { desc = '[S]earch [F]iles' })
 vim.keymap.set('n', '<leader>g', require('telescope.builtin').live_grep, { desc = '[S]earch by [G]rep' })
+
+-- Claude Code
+-- Serves the same IDE protocol as the VS Code extension: `:ClaudeCode` opens
+-- claude in a split, or run `/ide` in a claude started elsewhere in the same dir.
+-- Claude sees the current file/selection live; diffs it proposes open here.
+require("claudecode").setup()
+
+vim.keymap.set('n', '<leader>cc', '<Cmd>ClaudeCode<CR>', { desc = 'Toggle Claude' })
+vim.keymap.set('n', '<leader>cf', '<Cmd>ClaudeCodeFocus<CR>', { desc = 'Focus Claude' })
+vim.keymap.set('n', '<leader>cb', '<Cmd>ClaudeCodeAdd %<CR>', { desc = 'Add buffer to Claude' })
+vim.keymap.set('v', '<leader>cs', '<Cmd>ClaudeCodeSend<CR>', { desc = 'Send selection to Claude' })
+vim.keymap.set('n', '<leader>ca', '<Cmd>ClaudeCodeDiffAccept<CR>', { desc = 'Accept Claude diff' })
+vim.keymap.set('n', '<leader>cd', '<Cmd>ClaudeCodeDiffDeny<CR>', { desc = 'Deny Claude diff' })
