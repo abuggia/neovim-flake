@@ -312,3 +312,5 @@ vim.keymap.set('n', '<leader>cb', '<Cmd>ClaudeCodeAdd %<CR>', { desc = 'Add buff
 vim.keymap.set('v', '<leader>cs', '<Cmd>ClaudeCodeSend<CR>', { desc = 'Send selection to Claude' })
 vim.keymap.set('n', '<leader>ca', '<Cmd>ClaudeCodeDiffAccept<CR>', { desc = 'Accept Claude diff' })
 vim.keymap.set('n', '<leader>cd', '<Cmd>ClaudeCodeDiffDeny<CR>', { desc = 'Deny Claude diff' })
+-- Leave a terminal (e.g. the claude split) for the window to its left in one key.
+vim.keymap.set('t', '<C-h>', [[<C-\><C-n><C-w>h]], { desc = 'Leave terminal to the left window' })

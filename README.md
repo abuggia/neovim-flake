@@ -49,3 +49,4 @@ vim.keymap.set('n', '<leader>g', require('telescope.builtin').live_grep, { desc 
   - `<leader>cb` - add current buffer to claude
   - `<leader>ca` / `<leader>cd` - accept / deny a proposed diff (`:w` / `:q` also work)
   - `<C-\><C-n>` - leave the claude terminal for normal mode
+  - `<C-h>` - leave the claude terminal for the editor on its left
