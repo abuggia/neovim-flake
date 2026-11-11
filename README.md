@@ -41,6 +41,17 @@ vim.keymap.set('n', '<leader>w', function() bufdelete.bufdelete(0, true) end, { 
 vim.keymap.set('n', '<leader>f', require('telescope.builtin').find_files, { desc = '[S]earch [F]iles' })
 vim.keymap.set('n', '<leader>g', require('telescope.builtin').live_grep, { desc = '[S]earch by [G]rep' })
 
+## c++
+
+clangd needs a `compile_commands.json` in the project root or `build/` (e.g. `cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON`); single files work without one.
+
+  - `<C-space>` - hover docs
+  - `<leader>a` - code actions
+  - `gd` - go to definition
+  - `rn` - rename symbol
+  - `<leader>h` - switch between source and header
+  - formats on save (uses the project's `.clang-format`)
+
 ## claude
 
   - `<leader>cc` - toggle claude terminal (or run `/ide` in a claude started elsewhere in the same dir)

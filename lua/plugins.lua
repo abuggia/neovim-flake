@@ -156,12 +156,47 @@ enable_lsp("svelte", {
 enable_lsp("tailwindcss")
 enable_lsp("terraformls")
 enable_lsp("tflint")
-enable_lsp("clangd", {
-  init_options = {
-      -- cmake can generate `compile_commands.json` but it goes in the build dir
-      compilationDatabasePath = 'build'
-  }
-})
+
+-- C/C++
+-- Use a dev shell's clangd if there is one, else the bundled one. Skip the
+-- system clangd (/usr/bin, which /bin links to on most Linux distros): the
+-- bundled tools come last on PATH, so on macOS Xcode's old /usr/bin/clangd
+-- would otherwise always win.
+local function find_clangd()
+  for _, dir in ipairs(vim.split(vim.env.PATH or "", ":", { trimempty = true })) do
+    if vim.uv.fs_realpath(dir) ~= "/usr/bin" and vim.fn.executable(dir .. "/clangd") == 1 then
+      return dir .. "/clangd"
+    end
+  end
+  return "clangd"
+end
+
+local clangd_cmd = { find_clangd() }
+
+-- macOS: let clangd ask the project's compiler (Xcode's clang, a dev shell's
+-- nix wrapper) for its system headers. Without this, the nix clangd mixes its
+-- own libc++ with the macOS SDK and <cstdint> and friends break. Not on Linux,
+-- where the nix clangd's own headers work and this would switch them off.
+-- Only compiler names are allowed, so a repo's compile_commands.json can't make
+-- clangd run arbitrary programs.
+if vim.fn.has("mac") == 1 then
+  table.insert(clangd_cmd, "--query-driver=" .. table.concat({
+    "/usr/bin/clang*", "/usr/bin/c++", "/usr/bin/cc", "/usr/bin/g++*", "/usr/bin/gcc*",
+    "/nix/store/*/bin/clang*", "/nix/store/*/bin/c++", "/nix/store/*/bin/cc",
+    "/nix/store/*/bin/g++*", "/nix/store/*/bin/gcc*",
+  }, ","))
+end
+
+-- clangd finds compile_commands.json in the project root or a build/ dir
+-- (e.g. `cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON`) on its own.
+enable_lsp("clangd", { cmd = clangd_cmd })
+
+local function set_code_keymaps(bufnr)
+  vim.keymap.set("n", "<C-space>", vim.lsp.buf.hover, { buffer = bufnr })
+  vim.keymap.set("n", "<leader>a", vim.lsp.buf.code_action, { buffer = bufnr })
+  vim.keymap.set("n", "gd", vim.lsp.buf.definition, { buffer = bufnr })
+  vim.keymap.set("n", "rn", vim.lsp.buf.rename, { buffer = bufnr })
+end
 
 -- Set up a group for LSP-related autocommands
 local lsp_augroup = vim.api.nvim_create_augroup("LspFormatting", { clear = true })
@@ -174,6 +209,10 @@ vim.api.nvim_create_autocmd("LspAttach", {
         vim.keymap.set('n','gd',vim.lsp.buf.definition,{buffer=args.buf;});
 
         local client = vim.lsp.get_client_by_id(args.data.client_id)
+        if client and client.name == "clangd" then
+            set_code_keymaps(args.buf)
+            vim.keymap.set('n', '<leader>h', '<Cmd>LspClangdSwitchSourceHeader<CR>', { buffer = args.buf, desc = 'Switch source/header' })
+        end
         -- Ensure the attached client supports formatting
         if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_formatting) then
             -- Set up format on save (optional but recommended)
@@ -192,10 +231,7 @@ vim.g.rustaceanvim = {
   server = {
     capabilities = capabilities,
     on_attach = function(_, bufnr)
-      vim.keymap.set("n", "<C-space>", vim.lsp.buf.hover, { buffer = bufnr })
-      vim.keymap.set("n", "<leader>a", vim.lsp.buf.code_action, { buffer = bufnr })
-      vim.keymap.set("n", "gd", vim.lsp.buf.definition, { buffer = bufnr })
-      vim.keymap.set("n", "rn", vim.lsp.buf.rename, { buffer = bufnr })
+      set_code_keymaps(bufnr)
     end,
   },
 }
