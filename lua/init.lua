@@ -1,3 +1,4 @@
 
+require("clipboard")
 require("plugins")
 
