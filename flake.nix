@@ -79,6 +79,8 @@
                   vim-just
                   # claude code ide integration
                   claudecode-nvim
+                  # git
+                  git-blame-nvim
                 ];
               };
 	          };

@@ -52,6 +52,13 @@ clangd needs a `compile_commands.json` in the project root or `build/` (e.g. `cm
   - `<leader>h` - switch between source and header
   - formats on save (uses the project's `.clang-format`)
 
+## git
+
+  - blame for the cursor line shows at the end of the line
+  - `:GitBlameToggle` - turn it off / on
+  - `:GitBlameOpenCommitURL` - open the line's commit in the browser
+  - `:GitBlameCopySHA` - copy the line's commit sha
+
 ## claude
 
   - `<leader>cc` - toggle claude terminal (or run `/ide` in a claude started elsewhere in the same dir)
